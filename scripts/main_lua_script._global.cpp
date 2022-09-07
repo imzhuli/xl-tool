@@ -1,6 +1,5 @@
-const char * GlobalLua =
+const char * GlobalLua = R"FQLuaScript(
 
-R"FQLuaScript(
     function SafeCall(TargetFunction, ...)
         local function MakeOptional(ok, ...)
             if (ok) then
@@ -17,9 +16,7 @@ R"FQLuaScript(
             ))
         return ok, result
     end
-)FQLuaScript"
 
-R"FQLuaScript(
     function SplitString(str, delimiter)
         local dLen = string.len(delimiter)
         local newDeli = ''
@@ -44,6 +41,31 @@ R"FQLuaScript(
         end
         return arr
     end
-)FQLuaScript"
 
-;
+    function Grep(str, sub)
+        local lines = SplitString(str, "\n")
+        local arr = {}
+        local n = 1
+        for _,line in ipairs(lines) do -- or or file:lines() if you have a different file
+            if line:find(sub) then -- Only lines containing the IP we care about
+                arr[n] = line
+                n = n + 1
+            end
+        end
+        return arr
+    end
+
+    function UriEncode (str)
+        str = string.gsub (str, "([^0-9a-zA-Z !'()*._~-])", -- locale independent
+            function (c) return string.format ("%%%02X", string.byte(c)) end)
+        str = string.gsub (str, " ", "+")
+        return str
+    end
+
+    function UriDecode (str)
+        str = string.gsub (str, "+", " ")
+        str = string.gsub (str, "%%(%x%x)", function(h) return string.char(tonumber(h,16)) end)
+        return str
+    end
+
+)FQLuaScript";

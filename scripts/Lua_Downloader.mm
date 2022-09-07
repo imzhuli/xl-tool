@@ -51,6 +51,14 @@
 }
 @end
 
+NSURLSession * DownloadSession()
+{
+    NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
+    sessionConfig.timeoutIntervalForRequest = 5.0;
+    sessionConfig.timeoutIntervalForResource = 5.0;
+    return [NSURLSession sessionWithConfiguration:sessionConfig];
+}
+
 std::string HttpGet(const char * URLStr)
 {
     NSURL *Url=[NSURL URLWithString:NS(URLStr)];
@@ -60,7 +68,7 @@ std::string HttpGet(const char * URLStr)
     __block xEvent * EventPtr = &FinishEvent;
     __block NSData * Data = NULL;
 
-    NSURLSessionDataTask * Task = [[NSURLSession sharedSession] dataTaskWithRequest:Request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error){
+    NSURLSessionDataTask * Task = [DownloadSession() dataTaskWithRequest:Request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error){
         Data = data;
         (EventPtr)->Notify();
     }];
@@ -87,7 +95,7 @@ std::string HttpPostForm(const char * URLStr, const std::string &RequestData)
     __block xEvent * EventPtr = &FinishEvent;
     __block NSData * Data = NULL;
 
-    NSURLSessionDataTask * Task = [[NSURLSession sharedSession] dataTaskWithRequest:Request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error){
+    NSURLSessionDataTask * Task = [DownloadSession() dataTaskWithRequest:Request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error){
         Data = data;
         (EventPtr)->Notify();
     }];
@@ -113,7 +121,7 @@ std::string HttpPostJson(const char * URLStr, const std::string &Json)
     __block xEvent * EventPtr = &FinishEvent;
     __block NSData * Data = NULL;
 
-    NSURLSessionDataTask * Task = [[NSURLSession sharedSession] dataTaskWithRequest:Request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error){
+    NSURLSessionDataTask * Task = [DownloadSession() dataTaskWithRequest:Request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error){
         Data = data;
         (EventPtr)->Notify();
     }];
