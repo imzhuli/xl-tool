@@ -1,0 +1,9 @@
+Package: com.xe.lee.xl-tool
+Name: xl-tool
+Version: 0.0.1
+Architecture: iphoneos-arm
+Description: An awesome tool of some sort!!
+Maintainer: Zhu Li
+Author: Zhu Li
+Section: System
+Tag: role::hacker
