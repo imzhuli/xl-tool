@@ -55,10 +55,11 @@ int main(int argc, char *argv[], char *envp[]) {
 	auto OptSetHightWaterMark = Cmd["set_high_water_mark"];
 	if (OptSetHightWaterMark()) {
 		int32_t pid = atoll(OptSetHightWaterMark->c_str());
+		int oldLimit = GetHightWaterMark(pid);
 		int limit = 16 * 1024 * 1024;
 		SetHighWaterMark(pid, limit);
 		int newLimit = GetHightWaterMark(pid);
-		cout << "Set HighWaterMark for pid=" << pid << " to " << limit << ", updatedValue=" << newLimit << endl;
+		cout << "Set HighWaterMark for pid=" << pid << " from " << oldLimit << " to " << limit << ", updatedValue=" << newLimit << endl;
 		return 0;
 	}
 
