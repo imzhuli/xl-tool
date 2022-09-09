@@ -18,8 +18,8 @@ int main(int argc, char *argv[], char *envp[]) {
 	xCommandLine Cmd = { argc, argv, {
 		{ 'l', "lua",   "lua_file", true },
 		{ 'p', "plist", "plist_file", true },
-		{ 's', "sh",    "shell", true}
 	}};
+	cout << Cmd.DescribeOptions() << endl;
 
 	auto OptLuaFile = Cmd["lua_file"];
 	if (OptLuaFile()) {
@@ -42,10 +42,4 @@ int main(int argc, char *argv[], char *envp[]) {
 		return 0;
 	}
 
-	auto OptShell = Cmd["shell"];
-	if (OptShell()) {
-		auto ShellCommand = *OptShell;
-		//return system(ShellCommand.c_str());
-		return 0;
-	}
 }
