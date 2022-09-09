@@ -25,6 +25,9 @@ script_FILES = \
 	scripts/main_lua.cpp \
 	scripts/Lua_All.cpp scripts/Lua_Downloader.mm scripts/Lua_Crypto.mm scripts/Lua_Device.mm scripts/Lua_System.mm scripts/Lua_Task.cpp scripts/Lua_Logger.cpp
 
+ios_FILES = \
+	iOS/Limits.mm
+
 x_FILES = \
 	${minizip_FILES} \
 	X_Fishhook.c \
@@ -35,12 +38,12 @@ x_FILES = \
 xl_tool_FILES = \
 	main.xm \
 	${script_FILES} \
+	${ios_FILES} \
 	${x_FILES}
 
 xl_tool_CFLAGS = -fobjc-arc -Wno-unused-function -Wno-unused-but-set-variable ${minizip_DEFS}
 xl_tool_CCFLAGS = -std=c++17 -Wno-unused-function -Wno-deprecated -Wno-auto-var-id
 xl_tool_LIBRARIES = z
-xl_tool_LDFLAGS =
 xl_tool_CODESIGN_FLAGS = -Sentitlements.plist
 xl_tool_INSTALL_PATH = /usr/local/bin
 

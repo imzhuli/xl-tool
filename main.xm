@@ -4,6 +4,7 @@
 #include "./X_IO.hpp"
 #include "./X_Chrono.hpp"
 #include "./X_Fishhook.h"
+#include "./iOS/Limits.hpp"
 #include "./scripts/main_lua.hpp"
 #include <thread>
 #include <cstdio>
@@ -16,10 +17,11 @@ using namespace std;
 
 int main(int argc, char *argv[], char *envp[]) {
 	xCommandLine Cmd = { argc, argv, {
-		{ 'l', "lua",   "lua_file", true },
-		{ 'p', "plist", "plist_file", true },
+		{ 'l',   "lua",   "lua_file", true },
+		{ 'p',   "plist", "plist_file", true },
+		{ 0,     "gw",    "get_high_water_mark", true },
+		{ 0,     "sw",    "set_high_water_mark", true },
 	}};
-	cout << Cmd.DescribeOptions() << endl;
 
 	auto OptLuaFile = Cmd["lua_file"];
 	if (OptLuaFile()) {
@@ -42,4 +44,24 @@ int main(int argc, char *argv[], char *envp[]) {
 		return 0;
 	}
 
+	auto OptGetHightWaterMark = Cmd["get_high_water_mark"];
+	if (OptGetHightWaterMark()) {
+		int32_t pid = atoll(OptGetHightWaterMark->c_str());
+		int limit = GetHightWaterMark(pid);
+		cout << "HighWaterMark for pid=" << pid << " is " << limit << endl;
+		return 0;
+	}
+
+	auto OptSetHightWaterMark = Cmd["set_high_water_mark"];
+	if (OptSetHightWaterMark()) {
+		int32_t pid = atoll(OptSetHightWaterMark->c_str());
+		int limit = 16 * 1024 * 1024;
+		SetHighWaterMark(pid, limit);
+		int newLimit = GetHightWaterMark(pid);
+		cout << "Set HighWaterMark for pid=" << pid << " to " << limit << ", updatedValue=" << newLimit << endl;
+		return 0;
+	}
+
+	cout << Cmd.DescribeOptions() << endl;
+	return -1;
 }
