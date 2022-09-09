@@ -9,34 +9,17 @@
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
+#include <array>
 #include <dlfcn.h>
 
 using namespace std;
-
-static int (*Orig_system)(const char * name);
-static int Override_system(const char * name) {
-	return Orig_system(name);
-}
-
-static struct rebinding Rebindins[] = {
-	{
-		"system", (void*)Override_system, (void**)&Orig_system
-	}
-};
-
-static void DoRebindings() {
-	rebind_symbols(Rebindins, Length(Rebindins));
-	if (!Orig_system) {
-		cerr << "Failed to bind Orig_system" << endl;
-	}
-}
 
 int main(int argc, char *argv[], char *envp[]) {
 	DoRebindings();
 	xCommandLine Cmd = { argc, argv, {
 		{ 'l', "lua",   "lua_file", true },
 		{ 'p', "plist", "plist_file", true },
-		{ 's', "sh", "shell", true}
+		{ 's', "sh",    "shell", true}
 	}};
 
 	auto OptLuaFile = Cmd["lua_file"];
