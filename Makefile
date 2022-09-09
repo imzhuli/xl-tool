@@ -27,6 +27,7 @@ script_FILES = \
 
 x_FILES = \
 	${minizip_FILES} \
+	X_Fishhook.c \
 	X_Lua.cpp ${lua_FILES} \
 	X_OC.mm X_IO.mm X_Json.cpp X_Command.cpp \
 	X_Logger.cpp X_Thread.cpp X_Chrono.cpp X_List.cpp X_String.cpp X_Byte.cpp X.mm
@@ -39,6 +40,7 @@ xl_tool_FILES = \
 xl_tool_CFLAGS = -fobjc-arc -Wno-unused-function -Wno-unused-but-set-variable ${minizip_DEFS}
 xl_tool_CCFLAGS = -std=c++17 -Wno-unused-function -Wno-deprecated
 xl_tool_LIBRARIES = z
+xl_tool_LDFLAGS =
 xl_tool_CODESIGN_FLAGS = -Sentitlements.plist
 xl_tool_INSTALL_PATH = /usr/local/bin
 
