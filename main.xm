@@ -15,7 +15,6 @@
 using namespace std;
 
 int main(int argc, char *argv[], char *envp[]) {
-	DoRebindings();
 	xCommandLine Cmd = { argc, argv, {
 		{ 'l', "lua",   "lua_file", true },
 		{ 'p', "plist", "plist_file", true },
