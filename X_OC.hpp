@@ -11,4 +11,5 @@
 #import <AdSupport/AdSupport.h>
 
 X_HIDDEN NSString *  NS(const std::string & String);
-X_HIDDEN std::string ToString(id OcObjectId);
+X_HIDDEN std::string CS(id OcObjectId);
+X_HIDDEN id PlistToContainer(const std::string & PlistContents);

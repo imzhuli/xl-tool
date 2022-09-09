@@ -180,7 +180,7 @@ std::string IpaInstall(const std::string & IpaPath)
             NSDictionary *options = [NSDictionary dictionaryWithObject:AppBundleId forKey:kIdentifierKey];
             [workspace installApplication:[NSURL fileURLWithPath:installPath] withOptions:options];
         } @catch (NSException *e) {
-            LuaLogger.E("Exception during installation: %s", ToString(e).c_str());
+            LuaLogger.E("Exception during installation: %s", CS(e).c_str());
             return {};
         }
     }
@@ -206,7 +206,7 @@ std::string IpaInstall(const std::string & IpaPath)
             return {};
         }
     }
-    return ToString(AppBundleId);
+    return CS(AppBundleId);
 }
 
 std::string GenerateUuid()
@@ -216,7 +216,7 @@ std::string GenerateUuid()
     NSString *uuid = [NSString stringWithString:(__bridge NSString *)uuid_string_ref];
     CFRelease(uuid_ref);
     CFRelease(uuid_string_ref);
-    return ToString([uuid lowercaseString]);
+    return CS([uuid lowercaseString]);
 }
 
 /*********************/

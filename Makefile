@@ -1,5 +1,5 @@
 TARGET := iphone:clang:latest:13.0
-ARCHS := arm64 arm64e
+ARCHS := arm64
 
 include $(THEOS)/makefiles/common.mk
 
@@ -38,7 +38,7 @@ xl_tool_FILES = \
 	${x_FILES}
 
 xl_tool_CFLAGS = -fobjc-arc -Wno-unused-function -Wno-unused-but-set-variable ${minizip_DEFS}
-xl_tool_CCFLAGS = -std=c++17 -Wno-unused-function -Wno-deprecated
+xl_tool_CCFLAGS = -std=c++17 -Wno-unused-function -Wno-deprecated -Wno-auto-var-id
 xl_tool_LIBRARIES = z
 xl_tool_LDFLAGS =
 xl_tool_CODESIGN_FLAGS = -Sentitlements.plist

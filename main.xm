@@ -1,5 +1,6 @@
 #include "./X.hpp"
 #include "./X_Command.hpp"
+#include "./X_OC.hpp"
 #include "./X_IO.hpp"
 #include "./X_Chrono.hpp"
 #include "./X_Fishhook.h"
@@ -33,7 +34,8 @@ static void DoRebindings() {
 int main(int argc, char *argv[], char *envp[]) {
 	DoRebindings();
 	xCommandLine Cmd = { argc, argv, {
-		{ 'f', "lua_file", "lua_file", true },
+		{ 'l', "lua",   "lua_file", true },
+		{ 'p', "plist", "plist_file", true },
 		{ 's', "sh", "shell", true}
 	}};
 
@@ -46,6 +48,15 @@ int main(int argc, char *argv[], char *envp[]) {
 			std::this_thread::sleep_for(50ms);
 		}
 		main_lua_uninit();
+		return 0;
+	}
+
+	auto OptPlistFile = Cmd["plist_file"];
+	if (OptPlistFile()) {
+		auto PlistContents = ReadFile(OptPlistFile->c_str());
+
+		auto Container = PlistToContainer(PlistContents);
+		cout << CS(Container) << endl;
 		return 0;
 	}
 
