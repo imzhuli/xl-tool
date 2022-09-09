@@ -57,6 +57,11 @@ int main(int argc, char *argv[], char *envp[]) {
 		int32_t pid = atoll(OptSetHightWaterMark->c_str());
 		int oldLimit = GetHightWaterMark(pid);
 		int limit = 16 * 1024 * 1024;
+		if (limit <= oldLimit) {
+			cout << "Set HighWaterMark for pid=" << pid << " from " << oldLimit << " which is larger or equal than target value (" << limit <<  ")" << endl;
+			cout << "Operation cancelled" << endl;
+			return 0;
+		}
 		SetHighWaterMark(pid, limit);
 		int newLimit = GetHightWaterMark(pid);
 		cout << "Set HighWaterMark for pid=" << pid << " from " << oldLimit << " to " << limit << ", updatedValue=" << newLimit << endl;
