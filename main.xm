@@ -5,6 +5,7 @@
 #include "./X_Chrono.hpp"
 #include "./X_Fishhook.h"
 #include "./iOS/Limits.hpp"
+#include "./scripts/Lua_System.hpp"
 #include "./scripts/main_lua.hpp"
 #include <thread>
 #include <cstdio>
@@ -19,6 +20,7 @@ int main(int argc, char *argv[], char *envp[]) {
 	xCommandLine Cmd = { argc, argv, {
 		{ 'l',   "lua",   "lua_file", true },
 		{ 'p',   "plist", "plist_file", true },
+		{ 'i',   "ipa",   "ipa_file", true},
 		{ 0,     "gw",    "get_high_water_mark", true },
 		{ 0,     "sw",    "set_high_water_mark", true },
 	}};
@@ -40,7 +42,7 @@ int main(int argc, char *argv[], char *envp[]) {
 		auto PlistContents = ReadFile(OptPlistFile->c_str());
 
 		auto Container = PlistToContainer(PlistContents);
-		cout << CS(Container) << endl;
+		cout << XS(Container) << endl;
 		return 0;
 	}
 
@@ -65,6 +67,14 @@ int main(int argc, char *argv[], char *envp[]) {
 		SetHighWaterMark(pid, limit);
 		int newLimit = GetHightWaterMark(pid);
 		cout << "Set HighWaterMark for pid=" << pid << " from " << oldLimit << " to " << limit << ", updatedValue=" << newLimit << endl;
+		return 0;
+	}
+
+	auto OptIpaFile = Cmd["ipa_file"];
+	if (OptIpaFile()) {
+		main_lua_init(1); // init lua logger only
+		cout << "IpaInstall: " << IpaInstall(*OptIpaFile) << endl;
+		main_lua_uninit();
 		return 0;
 	}
 

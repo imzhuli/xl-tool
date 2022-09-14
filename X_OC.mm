@@ -8,7 +8,7 @@ NSString *  NS(const std::string & String)
     return [NSString stringWithUTF8String:String.c_str()];
 }
 
-std::string CS(id OcObjectId)
+std::string XS(id OcObjectId)
 {
     if (!OcObjectId) {
         return "(nil)";

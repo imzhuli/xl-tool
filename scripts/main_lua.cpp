@@ -122,6 +122,7 @@ void main_lua_init(size_t TaskThreadCount, const std::string & InitTask)
     if (InitTask.size()) {
         PostLuaScript(InitTask);
     }
+    LuaLogger.I("lua inited");
 }
 
 void main_lua_uninit(void)
@@ -131,6 +132,7 @@ void main_lua_uninit(void)
     for (auto & Thread : Threads) {
         Thread.join();
     }
+    LuaLogger.I("lua uninited");
     LuaLogger.Clean();
 }
 

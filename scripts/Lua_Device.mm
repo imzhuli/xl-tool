@@ -11,7 +11,7 @@ std::string GetFMVersion()
 std::string GetDeviceIdfv()
 {
     NSUUID * Idfv = [[UIDevice currentDevice] identifierForVendor];
-    return CS(Idfv);
+    return XS(Idfv);
 }
 
 std::string GetIpAddress()
@@ -42,7 +42,7 @@ std::string GetIpAddress()
     }
     // Free memory
     freeifaddrs(interfaces);
-    return CS(address);
+    return XS(address);
 }
 
 int Lua_GetIpAddress(lua_State * LP)
