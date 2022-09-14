@@ -61,6 +61,8 @@ static void LuaTaskThread()
 
     LuaState.SetGlobal("LuaDeviceIdfv", GetDeviceIdfv());
     LuaState.SetGlobal("LuaFMVersion", GetFMVersion());
+
+    LuaState.SetGlobal("LuaTaskList", &TaskList);
     LuaState.SetGlobal("LuaAppendScriptTask", &Lua_AppendLocalScriptTask);
 
     LuaState.Execute(GlobalLua);
