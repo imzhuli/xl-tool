@@ -39,9 +39,9 @@ ios_FILES = \
 	iOS/Limits.mm iOS/Events.mm iOS/FakeTouch.mm
 
 x_FILES = \
+	X_Lua.cpp ${lua_FILES} \
 	${minizip_FILES} \
 	X_Fishhook.c \
-	X_Lua.cpp ${lua_FILES} \
 	X_OC.mm X_IO.mm X_Json.cpp X_Command.cpp \
 	X_Logger.cpp X_Thread.cpp X_Chrono.cpp X_List.cpp X_String.cpp X_Byte.cpp X.mm
 
@@ -52,10 +52,10 @@ xl_tool_FILES = \
 	${ios_FILES} \
 	${x_FILES}
 
-xl_tool_ExtraFrameworkPaths = -F ${THEOS}/sdks/iPhoneOS.Extended
-xl_tool_CFLAGS  += -fobjc-arc -Wno-unused-function -Wno-deprecated -Wno-unused-but-set-variable ${xl_tool_ExtraFrameworkPaths} ${minizip_DEFS}
-xl_tool_CCFLAGS += -std=c++17 -Wno-unused-function -Wno-deprecated -Wno-auto-var-id
-xl_tool_LDFLAGS += ${xl_tool_ExtraFrameworkPaths}
+ExtraFramePaths = -F ${THEOS}/sdks/iPhoneOS.Extended
+xl_tool_CFLAGS  += -fobjc-arc -Wno-unused-function -Wno-deprecated -Wno-unused-but-set-variable ${ExtraFramePaths} ${minizip_DEFS}
+xl_tool_CCFLAGS += -std=c++17 -Wno-unused-function -Wno-deprecated -Wno-unused-but-set-variable -Wno-auto-var-id
+xl_tool_LDFLAGS += ${ExtraFramePaths}
 xl_tool_FRAMEWORKS += IOKit XCTest
 xl_tool_LIBRARIES = z
 xl_tool_CODESIGN_FLAGS = -Sentitlements.plist

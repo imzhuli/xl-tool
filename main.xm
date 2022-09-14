@@ -87,6 +87,7 @@ int main(int argc, char *argv[], char *envp[]) {
 		[FakeTouch fakeTouchId:pointId AtPoint:CGPointMake(150,150) withTouchPhase:UITouchPhaseMoved];
 		std::this_thread::sleep_for(10ms);
 		[FakeTouch fakeTouchId:pointId AtPoint:CGPointMake(300,300) withTouchPhase:UITouchPhaseEnded];
+		std::this_thread::sleep_for(3s);
 		return 0;
 	}
 
