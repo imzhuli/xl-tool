@@ -1,12 +1,11 @@
 //
-//  PTFakeMetaTouch.m
-//  PTFakeTouch
+//  FakeTouch
 //
 //  Created by PugaTang on 16/4/20.
 //  Copyright © 2016年 PugaTang. All rights reserved.
 //
 
-#include "./details/FakeMetaTouch.h"
+#include "./FakeTouch.hpp"
 #include "../3rd/kif/UITouch-KIFAdditions.h"
 #include "../3rd/kif/UIApplication-KIFAdditions.h"
 #include "../3rd/kif/UIView-KIFAdditions.h"
@@ -14,7 +13,7 @@
 
 static NSMutableArray *touchAry;
 
-@implementation FakeMetaTouch
+@implementation FakeTouch
 
 + (void)load{
     touchAry = [[NSMutableArray alloc] init];
@@ -31,7 +30,7 @@ static NSMutableArray *touchAry;
         //随机一个没有使用的pointId
         pointId = [self getAvailablePointId];
         if (pointId==0) {
-            // DLog(@"PTFakeTouch ERROR! pointId all used");
+            // DLog(@"FakeTouch ERROR! pointId all used");
             return 0;
         }
     }

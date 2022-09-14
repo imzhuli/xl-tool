@@ -27,9 +27,7 @@
     @autoreleasepool {
         if (NSClassFromString(@"UIApplication")) {
             [UIApplication swizzleRunLoop];
-            NSLog(@"KIFTester loaded");
         } else {
-            NSLog(@"KIFTester skipping runloop swizzling, no UIApplication class found.");
         }
     }
 }
@@ -84,7 +82,7 @@
     NSDate *startDate = [NSDate date];
     KIFTestStepResult result;
     NSError *internalError;
-    
+
     while ((result = executionBlock(&internalError)) == KIFTestStepResultWait && -[startDate timeIntervalSinceNow] < timeout) {
         CFRunLoopRunInMode([[UIApplication sharedApplication] currentRunLoopMode] ?: kCFRunLoopDefaultMode, KIFTestStepDelay, false);
     }
@@ -101,7 +99,7 @@
     if (error) {
         *error = internalError;
     }
-    
+
     return result != KIFTestStepResultFailure;
 }
 
@@ -235,9 +233,9 @@ static NSTimeInterval KIFTestStepFirstResponderTimeout = 0.5;
     if (scaleTime) {
         timeInterval /= [UIApplication sharedApplication].animationSpeed;
     }
-    
+
     NSTimeInterval startTime = [NSDate timeIntervalSinceReferenceDate];
-    
+
     [self runBlock:^KIFTestStepResult(NSError **error) {
         KIFTestWaitCondition((([NSDate timeIntervalSinceReferenceDate] - startTime) >= timeInterval), error, @"Waiting for time interval to expire.");
         return KIFTestStepResultSuccess;

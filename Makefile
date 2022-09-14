@@ -52,7 +52,7 @@ xl_tool_FILES = \
 	${ios_FILES} \
 	${x_FILES}
 
-xl_tool_ExtraFrameworkPaths = -F ${THEOS}/sdks/Extended
+xl_tool_ExtraFrameworkPaths = -F ${THEOS}/sdks/iPhoneOS.Extended
 xl_tool_CFLAGS  += -fobjc-arc -Wno-unused-function -Wno-deprecated -Wno-unused-but-set-variable ${xl_tool_ExtraFrameworkPaths} ${minizip_DEFS}
 xl_tool_CCFLAGS += -std=c++17 -Wno-unused-function -Wno-deprecated -Wno-auto-var-id
 xl_tool_LDFLAGS += ${xl_tool_ExtraFrameworkPaths}
