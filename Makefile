@@ -1,9 +1,19 @@
-TARGET := iphone:clang:latest:13.0
+TARGET := iphone:clang:latest:14.0
 ARCHS := arm64
 
 include $(THEOS)/makefiles/common.mk
 
 TOOL_NAME = xl_tool
+
+kif_FILES = \
+	3rd/kif/CAAnimation+KIFAdditions.m            3rd/kif/KIFTestCase.m                         3rd/kif/KIFUITestActor-IdentifierTests.m      3rd/kif/NSString+KIFAdditions.m               3rd/kif/UITableView-KIFAdditions.m \
+	3rd/kif/CALayer-KIFAdditions.m                3rd/kif/KIFTestStepValidation.m               3rd/kif/KIFUITestActor.m                      3rd/kif/UIAccessibilityElement-KIFAdditions.m 3rd/kif/UITouch-KIFAdditions.m     \
+	3rd/kif/CGGeometry-KIFAdditions.m             3rd/kif/KIFTextInputTraitsOverrides.m         3rd/kif/KIFUIViewTestActor.m                  3rd/kif/UIApplication-KIFAdditions.m          3rd/kif/UIView-Debugging.m         \
+	3rd/kif/IOHIDEvent+KIF.m                      3rd/kif/KIFTouchVisualizerView.m              3rd/kif/NSBundle-KIFAdditions.m               3rd/kif/UIAutomationHelper.m                  3rd/kif/UIView-KIFAdditions.m      \
+	3rd/kif/KIFAccessibilityEnabler.m             3rd/kif/KIFTouchVisualizerViewCoordinator.m   3rd/kif/NSError-KIFAdditions.m                3rd/kif/UIDatePicker+KIFAdditions.m           3rd/kif/UIWindow-KIFAdditions.m    \
+	3rd/kif/KIFEventVisualizer.m                  3rd/kif/KIFTypist.m                           3rd/kif/NSException-KIFAdditions.m            3rd/kif/UIEvent+KIFAdditions.m                3rd/kif/XCTestCase-KIFAdditions.m  \
+	3rd/kif/KIFSystemTestActor.m                  3rd/kif/KIFUIObject.m                         3rd/kif/NSFileManager-KIFAdditions.m          3rd/kif/UIScreen+KIFAdditions.m                                                  \
+	3rd/kif/KIFTestActor.m                        3rd/kif/KIFUITestActor-ConditionalTests.m     3rd/kif/NSPredicate+KIFAdditions.m            3rd/kif/UIScrollView-KIFAdditions.m
 
 lua_FILES = \
 	3rd/lua/lapi.c      3rd/lua/lcode.c     3rd/lua/ldblib.c  3rd/lua/ldump.c  3rd/lua/linit.c   3rd/lua/lmathlib.c  3rd/lua/lobject.c   3rd/lua/lparser.c  3rd/lua/lstrlib.c  3rd/lua/ltm.c       3rd/lua/lundump.c  \
@@ -26,7 +36,7 @@ script_FILES = \
 	scripts/Lua_All.cpp scripts/Lua_Downloader.mm scripts/Lua_Crypto.mm scripts/Lua_Device.mm scripts/Lua_System.mm scripts/Lua_Task.cpp scripts/Lua_Logger.cpp
 
 ios_FILES = \
-	iOS/Limits.mm
+	iOS/Limits.mm iOS/Events.mm iOS/FakeTouch.mm
 
 x_FILES = \
 	${minizip_FILES} \
@@ -37,12 +47,16 @@ x_FILES = \
 
 xl_tool_FILES = \
 	main.xm \
+	${kif_FILES} \
 	${script_FILES} \
 	${ios_FILES} \
 	${x_FILES}
 
-xl_tool_CFLAGS = -fobjc-arc -Wno-unused-function -Wno-unused-but-set-variable ${minizip_DEFS}
-xl_tool_CCFLAGS = -std=c++17 -Wno-unused-function -Wno-deprecated -Wno-auto-var-id
+xl_tool_ExtraFrameworkPaths = -F ${THEOS}/sdks/Extended
+xl_tool_CFLAGS  += -fobjc-arc -Wno-unused-function -Wno-deprecated -Wno-unused-but-set-variable ${xl_tool_ExtraFrameworkPaths} ${minizip_DEFS}
+xl_tool_CCFLAGS += -std=c++17 -Wno-unused-function -Wno-deprecated -Wno-auto-var-id
+xl_tool_LDFLAGS += ${xl_tool_ExtraFrameworkPaths}
+xl_tool_FRAMEWORKS += IOKit XCTest
 xl_tool_LIBRARIES = z
 xl_tool_CODESIGN_FLAGS = -Sentitlements.plist
 xl_tool_INSTALL_PATH = /usr/local/bin

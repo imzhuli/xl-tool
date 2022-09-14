@@ -3,7 +3,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include "./kern_memorystatus.h"
+#include "./kernel/memorystatus.h"
 #include "./Limits.hpp"
 
 int SetHighWaterMark(int32_t pid, int limit) {
