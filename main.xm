@@ -5,7 +5,6 @@
 #include "./X_Chrono.hpp"
 #include "./X_Fishhook.h"
 #include "./iOS/Limits.hpp"
-#include "./iOS/FakeTouch.hpp"
 #include "./scripts/Lua_System.hpp"
 #include "./scripts/main_lua.hpp"
 #include <thread>
@@ -24,7 +23,6 @@ int main(int argc, char *argv[], char *envp[]) {
 		{ 'i',   "ipa",        "ipa_file",             true},
 		{ 0,     "gw",         "get_high_water_mark",  true },
 		{ 0,     "sw",         "set_high_water_mark",  true },
-		{ 0,     "fk-swipe",   "fk_swipe",             false},
 	}};
 
 	auto OptLuaFile = Cmd["lua_file"];
@@ -77,17 +75,6 @@ int main(int argc, char *argv[], char *envp[]) {
 		main_lua_init(1); // init lua logger only
 		cout << "IpaInstall: " << IpaInstall(*OptIpaFile) << endl;
 		main_lua_uninit();
-		return 0;
-	}
-
-	auto OptFakeSwipe = Cmd["fk_swipe"];
-	if (OptFakeSwipe()) {
-		NSInteger pointId = [FakeTouch fakeTouchId:[FakeTouch getAvailablePointId] AtPoint:CGPointMake(100,100) withTouchPhase:UITouchPhaseBegan];
-		std::this_thread::sleep_for(10ms);
-		[FakeTouch fakeTouchId:pointId AtPoint:CGPointMake(150,150) withTouchPhase:UITouchPhaseMoved];
-		std::this_thread::sleep_for(10ms);
-		[FakeTouch fakeTouchId:pointId AtPoint:CGPointMake(300,300) withTouchPhase:UITouchPhaseEnded];
-		std::this_thread::sleep_for(3s);
 		return 0;
 	}
 
