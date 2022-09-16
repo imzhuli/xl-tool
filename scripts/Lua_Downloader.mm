@@ -53,6 +53,7 @@
 
 NSURLSession * DownloadSession()
 {
+    [[NSURLCache sharedURLCache] removeAllCachedResponses];
     NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
     sessionConfig.timeoutIntervalForRequest = 5.0;
     sessionConfig.timeoutIntervalForResource = 5.0;
@@ -133,6 +134,39 @@ std::string HttpPostJson(const char * URLStr, const std::string &Json)
     return {};
 }
 
+std::string HttpPostRaw(const char * URLStr, const std::string &Raw, const std::string & ContentType)
+{
+    NSURL *Url=[NSURL URLWithString:NS(URLStr)];
+    NSData * PostData = [NSData dataWithBytes:Raw.data() length:Raw.length()];
+    NSMutableURLRequest *Request=[[NSMutableURLRequest alloc] initWithURL:Url];
+    [Request setHTTPMethod:@"POST"];
+    if (ContentType.empty()) {
+        [Request setValue:@"application/octet-stream" forHTTPHeaderField:@"Content-Type"];
+    } else {
+        [Request setValue:NS(ContentType) forHTTPHeaderField:@"Content-Type"];
+    }
+    [Request setValue:[NSString stringWithFormat:@"%lu", [PostData length]] forHTTPHeaderField:@"Content-Length"];
+    [Request setHTTPBody: PostData];
+
+    xEvent FinishEvent;
+    __block xEvent * EventPtr = &FinishEvent;
+    __block NSData * Data = NULL;
+
+    NSURLSessionDataTask * Task = [DownloadSession() dataTaskWithRequest:Request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error){
+        if (error) {
+            LuaLogger.E("HttpPostRaw error: %s", XS(error).c_str());
+        }
+        Data = data;
+        (EventPtr)->Notify();
+    }];
+    [Task resume];
+    FinishEvent.Wait([]{});
+    if(Data) {
+        return { (const char *)Data.bytes, (size_t)Data.length };
+    }
+    return {};
+}
+
 bool HttpDownloadFile(const char * UrlStr, const char * Filename)
 {
     xEvent FinishEvent;
@@ -161,6 +195,13 @@ int Lua_HttpPostJson(lua_State * LP)
 	auto W = xLuaStateWrapper(LP);
     auto [Url, Data] = W.Pop<std::string, std::string>();
 	return W.Return(HttpPostJson(Url.c_str(), Data));
+}
+
+int Lua_HttpPostRawText(lua_State * LP)
+{
+	auto W = xLuaStateWrapper(LP);
+    auto [Url, Data] = W.Pop<std::string, std::string>();
+	return W.Return(HttpPostRaw(Url.c_str(), Data, "text/plain"));
 }
 
 int Lua_HttpDownloadFile(lua_State * LP)

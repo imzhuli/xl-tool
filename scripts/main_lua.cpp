@@ -48,6 +48,7 @@ static void LuaTaskThread()
     LuaState.SetGlobal("LuaHttpGet", &Lua_HttpGet);
     LuaState.SetGlobal("LuaHttpPostForm", &Lua_HttpPostForm);
     LuaState.SetGlobal("LuaHttpPostJson", &Lua_HttpPostJson);
+    LuaState.SetGlobal("LuaHttpPostText", &Lua_HttpPostRawText);
     LuaState.SetGlobal("LuaHttpDownloadFile", &Lua_HttpDownloadFile);
     LuaState.SetGlobal("LuaRemove", &Lua_Remove);
     LuaState.SetGlobal("LuaIpaInstall", &Lua_IpaInstall);

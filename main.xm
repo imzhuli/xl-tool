@@ -18,17 +18,28 @@ using namespace std;
 
 int main(int argc, char *argv[], char *envp[]) {
 	xCommandLine Cmd = { argc, argv, {
-		{ 'l',   "lua",        "lua_file",             true },
+		{ 'l',   "lua",        "lua",                  true },
+		{ 'f',   "lua_file",   "lua_file",             true },
 		{ 'p',   "plist",      "plist_file",           true },
 		{ 'i',   "ipa",        "ipa_file",             true},
 		{ 0,     "gw",         "get_high_water_mark",  true },
 		{ 0,     "sw",         "set_high_water_mark",  true },
 	}};
 
+	auto OptLua = Cmd["lua"];
+	if (OptLua()) {
+		auto LuaScript = *OptLua;
+		main_lua_init(1, LuaScript);
+		while(!PublicStopFlag) {
+			std::this_thread::sleep_for(50ms);
+		}
+		main_lua_uninit();
+		return 0;
+	}
+
 	auto OptLuaFile = Cmd["lua_file"];
 	if (OptLuaFile()) {
 		auto LuaScript = ReadFile(OptLuaFile->c_str());
-
 		main_lua_init(1, LuaScript);
 		while(!PublicStopFlag) {
 			std::this_thread::sleep_for(50ms);
