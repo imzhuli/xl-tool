@@ -1,5 +1,32 @@
 const char * GlobalLua = R"FQLuaScript(
 
+    function CharToHex(c)
+        return string.format("%%%02X", string.byte(c))
+    end
+
+    function UrlEncode(url)
+        if url == nil then
+            return
+        end
+        url = url:gsub("\n", "\r\n")
+        url = url:gsub("([^%w ])", CharToHex)
+        url = url:gsub(" ", "+")
+        return url
+    end
+
+    function HexToChar(x)
+        return string.char(tonumber(x, 16))
+    end
+
+    function UrlDecode(url)
+        if url == nil then
+            return
+        end
+        url = url:gsub("+", " ")
+        url = url:gsub("%%(%x%x)", HexToChar)
+        return url
+    end
+
     function SafeCall(TargetFunction, ...)
         local function MakeOptional(ok, ...)
             if (ok) then
