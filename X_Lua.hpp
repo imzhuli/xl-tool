@@ -68,15 +68,13 @@ public:
     std::enable_if_t<std::is_integral_v<tArg> && !std::is_pointer_v<tArg> && !std::is_same_v<tArg, bool>> Push(tArg Value) const { lua_pushinteger(_LuaStatePtr, (lua_Integer)Value); }
     template<typename tArg>
     std::enable_if_t<std::is_floating_point_v<tArg>> Push(tArg Number) const { lua_pushnumber(_LuaStatePtr, Number); }
-    template<typename...Args>
-    void PushFS(const char * FmtStr, Args&&...args) const { lua_pushfstring(_LuaStatePtr, FmtStr, std::forward<Args>(args)...); }
     template<typename tK, typename tV>
-    ZEC_INLINE void Push(const std::pair<tK, tV> & KVPair) const {
+    void Push(const std::pair<tK, tV> & KVPair) const {
         Push(KVPair.first);
         Push(KVPair.second);
     }
-    template<typename T>
-    ZEC_INLINE void Push(const xIteratorRange<T> & Range) const {
+    template<typename tIter>
+    std::enable_if_t<!xIteratorRange<tIter>::IsPairIterator> Push(const xIteratorRange<tIter> & Range) const {
         lua_newtable(_LuaStatePtr);
         size_t Index = 0;
         for (auto & Item : Range) {
@@ -85,12 +83,23 @@ public:
             lua_settable(_LuaStatePtr, -3);
         }
     }
-
+    template<typename tIter>
+    std::enable_if_t<xIteratorRange<tIter>::IsPairIterator> Push(const xIteratorRange<tIter> & Range) const {
+        lua_newtable(_LuaStatePtr);
+        for (auto & Item : Range) {
+            Push(Item.first);
+            Push(Item.second);
+            lua_settable(_LuaStatePtr, -3);
+        }
+    }
     template<typename tFirstArg, typename...tOtherArgs>
     std::enable_if_t<static_cast<bool>(sizeof...(tOtherArgs))> Push(tFirstArg&& FirstArg, tOtherArgs&&...args) const {
         Push(std::forward<tFirstArg>(FirstArg));
         Push(std::forward<tOtherArgs>(args)...);
     }
+
+    template<typename...Args>
+    void PushFS(const char * FmtStr, Args&&...args) const { lua_pushfstring(_LuaStatePtr, FmtStr, std::forward<Args>(args)...); }
 
     template<typename...Args>
     [[nodiscard]]

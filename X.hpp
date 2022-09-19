@@ -129,37 +129,45 @@ xScopeGuard(const tEntry& Entry, const tExit& Exit) -> xScopeGuard<std::decay_t<
 template<typename tExit>
 xScopeGuard(const tExit& Exit) -> xScopeGuard<xPass, std::decay_t<tExit>>;
 
-    template<typename IteratorType>
-    class xIteratorRange
-    {
-        static_assert(!std::is_reference_v<IteratorType>);
-    public:
-        using iterator = IteratorType;
+template<typename IteratorType>
+class xIteratorRange
+{
+    static_assert(!std::is_reference_v<IteratorType>);
+    template<typename tIterator>
+    struct xIsPairReference : std::false_type {};
+    template<typename tK, typename tV>
+    struct xIsPairReference<std::pair<tK, tV> &> : std::true_type {};
+    template<typename tK, typename tV>
+    struct xIsPairReference<const std::pair<tK, tV> &> : std::true_type {};
 
-        xIteratorRange() = delete;
-        constexpr xIteratorRange(const IteratorType & Begin, const IteratorType & End): _Begin(Begin), _End(End) {}
-        template<typename tContainer>
-        constexpr xIteratorRange(tContainer & Container) : xIteratorRange(Container.begin(), Container.end()) {}
-        template<typename tContainer>
-        constexpr xIteratorRange(tContainer && Container) : xIteratorRange(Container.begin(), Container.end()) {}
+public:
+    using iterator = IteratorType;
+    static constexpr const bool IsPairIterator = xIsPairReference<decltype(*std::declval<IteratorType>())>::value;
 
-        constexpr xIteratorRange(const xIteratorRange &) = default;
-        constexpr xIteratorRange(xIteratorRange &&) = default;
-        constexpr xIteratorRange & operator = (const xIteratorRange &) = default;
-        constexpr xIteratorRange & operator = (xIteratorRange &&) = default;
+    xIteratorRange() = delete;
+    constexpr xIteratorRange(const IteratorType & Begin, const IteratorType & End): _Begin(Begin), _End(End) {}
+    template<typename tContainer>
+    constexpr xIteratorRange(tContainer & Container) : xIteratorRange(Container.begin(), Container.end()) {}
+    template<typename tContainer>
+    constexpr xIteratorRange(tContainer && Container) : xIteratorRange(Container.begin(), Container.end()) {}
 
-        constexpr IteratorType begin() const { return _Begin; }
-        constexpr IteratorType end()   const { return _End; }
-        constexpr auto size() const { return _End - _Begin; }
+    constexpr xIteratorRange(const xIteratorRange &) = default;
+    constexpr xIteratorRange(xIteratorRange &&) = default;
+    constexpr xIteratorRange & operator = (const xIteratorRange &) = default;
+    constexpr xIteratorRange & operator = (xIteratorRange &&) = default;
 
-    private:
-        IteratorType _Begin;
-        IteratorType _End;
-    };
-    template<typename tWrapper>
-    xIteratorRange(const tWrapper&) -> xIteratorRange<typename tWrapper::iterator>;
-    template<typename tWrapper>
-    xIteratorRange(tWrapper&&) -> xIteratorRange<typename tWrapper::iterator>;
+    constexpr IteratorType begin() const { return _Begin; }
+    constexpr IteratorType end()   const { return _End; }
+    constexpr auto size() const { return _End - _Begin; }
+
+private:
+    IteratorType _Begin;
+    IteratorType _End;
+};
+template<typename tWrapper>
+xIteratorRange(const tWrapper&) -> xIteratorRange<typename tWrapper::iterator>;
+template<typename tWrapper>
+xIteratorRange(tWrapper&&) -> xIteratorRange<typename tWrapper::iterator>;
 
 template<typename T>
 class xOptional final {
