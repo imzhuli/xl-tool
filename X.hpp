@@ -82,9 +82,9 @@ static inline constexpr const char * TF(bool t) { return t ? "true" : "false"; }
 
 template<typename T1, typename T2>
 using xDiff = decltype(std::declval<T1>() - std::declval<T2>());
-template<typename T1, typename T2> ZEC_INLINE constexpr auto Diff(const T1& Value, const T2& ComparedToValue) { return Value - ComparedToValue; }
-template<typename T1, typename T2> ZEC_INLINE constexpr auto SignedDiff(const T1& Value, const T2& ComparedToValue) { return static_cast<std::make_signed_t<xDiff<T1, T2>>>(Value - ComparedToValue); }
-template<typename T1, typename T2> ZEC_INLINE constexpr auto UnsignedDiff(const T1& Value, const T2& ComparedToValue) { return static_cast<std::make_unsigned_t<xDiff<T1, T2>>>(Value - ComparedToValue); }
+template<typename T1, typename T2> constexpr auto Diff(const T1& Value, const T2& ComparedToValue) { return Value - ComparedToValue; }
+template<typename T1, typename T2> constexpr auto SignedDiff(const T1& Value, const T2& ComparedToValue) { return static_cast<std::make_signed_t<xDiff<T1, T2>>>(Value - ComparedToValue); }
+template<typename T1, typename T2> constexpr auto UnsignedDiff(const T1& Value, const T2& ComparedToValue) { return static_cast<std::make_unsigned_t<xDiff<T1, T2>>>(Value - ComparedToValue); }
 
 template<typename T>
 class xRef final {
@@ -129,6 +129,37 @@ xScopeGuard(const tEntry& Entry, const tExit& Exit) -> xScopeGuard<std::decay_t<
 template<typename tExit>
 xScopeGuard(const tExit& Exit) -> xScopeGuard<xPass, std::decay_t<tExit>>;
 
+    template<typename IteratorType>
+    class xIteratorRange
+    {
+        static_assert(!std::is_reference_v<IteratorType>);
+    public:
+        using iterator = IteratorType;
+
+        xIteratorRange() = delete;
+        constexpr xIteratorRange(const IteratorType & Begin, const IteratorType & End): _Begin(Begin), _End(End) {}
+        template<typename tContainer>
+        constexpr xIteratorRange(tContainer & Container) : xIteratorRange(Container.begin(), Container.end()) {}
+        template<typename tContainer>
+        constexpr xIteratorRange(tContainer && Container) : xIteratorRange(Container.begin(), Container.end()) {}
+
+        constexpr xIteratorRange(const xIteratorRange &) = default;
+        constexpr xIteratorRange(xIteratorRange &&) = default;
+        constexpr xIteratorRange & operator = (const xIteratorRange &) = default;
+        constexpr xIteratorRange & operator = (xIteratorRange &&) = default;
+
+        constexpr IteratorType begin() const { return _Begin; }
+        constexpr IteratorType end()   const { return _End; }
+        constexpr auto size() const { return _End - _Begin; }
+
+    private:
+        IteratorType _Begin;
+        IteratorType _End;
+    };
+    template<typename tWrapper>
+    xIteratorRange(const tWrapper&) -> xIteratorRange<typename tWrapper::iterator>;
+    template<typename tWrapper>
+    xIteratorRange(tWrapper&&) -> xIteratorRange<typename tWrapper::iterator>;
 
 template<typename T>
 class xOptional final {
@@ -284,17 +315,17 @@ private:
     template<typename T, typename TValue>
     void
     Reset(T& ExpiringTarget,  TValue && value) { ExpiringTarget = std::forward<TValue>(value); }
-    
+
     template<typename T>
     void
-    Renew(T& ExpiringTarget) { 
+    Renew(T& ExpiringTarget) {
         ExpiringTarget.~T();
         new ((void*)&ExpiringTarget) T;
     }
 
     template<typename T, typename...tArgs>
     void
-    RenewValue(T& ExpiringTarget,  tArgs && ... Args) { 
+    RenewValue(T& ExpiringTarget,  tArgs && ... Args) {
         ExpiringTarget.~T();
         new ((void*)&ExpiringTarget) T {std::forward<tArgs>(Args)...};
     }

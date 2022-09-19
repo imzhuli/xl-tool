@@ -1,4 +1,5 @@
 #include "./Lua_All.hpp"
+#include "../X.hpp"
 #include "../X_OC.hpp"
 #include "../X_IO.hpp"
 #include "../3rd/minizip/mz_compat.h"
@@ -482,5 +483,5 @@ int Lua_GetIpaDataDirectories(lua_State * LP)
 	auto W = xLuaStateWrapper(LP);
 	auto [BundleId] = W.Pop<std::string>();
 	auto List = GetIpaDataDirectories(BundleId);
-	return W.Return(List);
+	return W.Return(xIteratorRange(List));
 }
