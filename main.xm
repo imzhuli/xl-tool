@@ -18,12 +18,13 @@ using namespace std;
 
 int main(int argc, char *argv[], char *envp[]) {
 	xCommandLine Cmd = { argc, argv, {
-		{ 'l',   "lua",        "lua",                  true },
-		{ 'f',   "lua_file",   "lua_file",             true },
-		{ 'p',   "plist",      "plist_file",           true },
-		{ 'i',   "ipa",        "ipa_file",             true},
-		{ 0,     "gw",         "get_high_water_mark",  true },
-		{ 0,     "sw",         "set_high_water_mark",  true },
+		{ 'l',   "lua",              "lua",                  true },
+		{ 'f',   "lua_file",         "lua_file",             true },
+		{ 'p',   "plist",            "plist_file",           true },
+		{ 'i',   "ipa",              "ipa_file",             true },
+		{ 'b',   "path-by-bundle",   "path-by-bundle",       true },
+		{ 0,     "gw",               "get_high_water_mark",  true },
+		{ 0,     "sw",               "set_high_water_mark",  true },
 	}};
 
 	auto OptLua = Cmd["lua"];
@@ -51,7 +52,6 @@ int main(int argc, char *argv[], char *envp[]) {
 	auto OptPlistFile = Cmd["plist_file"];
 	if (OptPlistFile()) {
 		auto PlistContents = ReadFile(OptPlistFile->c_str());
-
 		auto Container = PlistToContainer(PlistContents);
 		cout << XS(Container) << endl;
 		return 0;
@@ -86,6 +86,20 @@ int main(int argc, char *argv[], char *envp[]) {
 		main_lua_init(1); // init lua logger only
 		cout << "IpaInstall: " << IpaInstall(*OptIpaFile) << endl;
 		main_lua_uninit();
+		return 0;
+	}
+
+	auto OptPathByBundle = Cmd["path-by-bundle"];
+	if (OptPathByBundle()) {
+		auto Uuid = GetIpaUuidByBundleId(*OptPathByBundle);
+		auto DataPath = std::filesystem::path{"/private/var/mobile/Containers/Data/Application"} / Uuid;
+		cout << "Bundle Id: " << *OptPathByBundle << endl;
+		cout << "Uuid: " << Uuid << endl;
+
+		auto DataDirectories = GetIpaDataDirectories(*OptPathByBundle);
+		for (auto & Dir : DataDirectories) {
+			cout << "DataDir: " << Dir << endl;
+		}
 		return 0;
 	}
 

@@ -1,5 +1,6 @@
 #include "./Lua_All.hpp"
 #include "../X_OC.hpp"
+#include "../X_IO.hpp"
 #include "../3rd/minizip/mz_compat.h"
 #include <thread>
 #include <chrono>
@@ -350,6 +351,63 @@ std::string GenerateUuid()
 	return XS([uuid lowercaseString]);
 }
 
+std::string GetIpaUuidByBundleId(const std::string &BundleId)
+{
+	// SBApplication *application = [[SBApplicationController sharedInstance] applicationWithDisplayIdentifier:NS(BundleId)];
+	// return XS([application performSelector:@selector(containerPath)]);
+
+	std::error_code Error;
+	const std::filesystem::path AppContainerPath = "/private/var/containers/Bundle/Application";
+	if (!is_directory(AppContainerPath, Error)) {
+		return {};
+	}
+	std::string IpaUuid;
+	std::filesystem::path FullPath;
+	for (auto const& dir_entry : std::filesystem::directory_iterator{AppContainerPath}) {
+		for (auto const & sub_dir_entry : std::filesystem::directory_iterator{dir_entry}) {
+			if (!is_directory(sub_dir_entry, Error)) {
+				continue;
+			}
+			auto InfoPlist = sub_dir_entry.path() / "Info.plist";
+			if (!is_regular_file(InfoPlist, Error)) {
+				continue;
+			}
+			auto PlistContents = ReadFile(InfoPlist.c_str());
+			auto PlistDictionary = PlistToContainer(PlistContents);
+			auto PlistBundleId = [PlistDictionary objectForKey:@"CFBundleIdentifier"];
+			if (!PlistBundleId || ![PlistBundleId isKindOfClass:[NSString class]]) {
+				continue;
+			}
+			if (XS(PlistBundleId) == BundleId) {
+				FullPath = InfoPlist;
+				IpaUuid = dir_entry.path().filename().string();
+				break;
+			}
+		}
+    }
+	return IpaUuid;
+}
+
+std::vector<std::string> GetIpaDataDirectories(const std::string &BundleId)
+{
+	std::vector<std::string> List;
+
+	std::error_code Error;
+	const std::filesystem::path AppContainerPath = "/private/var/mobile/Containers/Data/Application";
+	if (!is_directory(AppContainerPath, Error)) {
+		return List;
+	}
+	std::string IpaUuid;
+	std::filesystem::path FullPath;
+	for (auto const& dir_entry : std::filesystem::directory_iterator{AppContainerPath}) {
+		auto CacheBundleFilename = dir_entry.path() / "Library" / "Caches" / BundleId;
+		if (is_directory(CacheBundleFilename, Error)) {
+			List.push_back(dir_entry.path());
+		}
+	}
+	return List;
+}
+
 /*********************/
 
 int Lua_SleepMS(lua_State * LP)
@@ -409,4 +467,20 @@ int Lua_MakeFile(lua_State * LP)
 	}
 	File << Contents;
 	return W.Return(true);
+}
+
+int Lua_GetIpaUuidByBundleId(lua_State * LP)
+{
+	auto W = xLuaStateWrapper(LP);
+	auto [BundleId] = W.Pop<std::string>();
+	auto Uuid = GetIpaUuidByBundleId(BundleId);
+	return W.Return(Uuid);
+}
+
+int Lua_GetIpaDataDirectories(lua_State * LP)
+{
+	auto W = xLuaStateWrapper(LP);
+	auto [BundleId] = W.Pop<std::string>();
+	auto List = GetIpaDataDirectories(BundleId);
+	return W.Return(List);
 }

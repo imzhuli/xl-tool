@@ -18,10 +18,7 @@ std::string XS(id OcObjectId)
 
 id PlistToContainer(const std::string & PlistContents)
 {
-    // const char * ContentString = [PlistContents cStringUsingEncoding:NSUTF8StringEncoding];
-    // size_t ContentStringLength = strlen(ContentString);
-    NSData * data = [NSData dataWithBytes:PlistContents.data() length:PlistContents.length()];
-
     NSError * Error = nil;
+    NSData * data = [NSData dataWithBytes:PlistContents.data() length:PlistContents.length()];
     return [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:nil error:&Error];
 }

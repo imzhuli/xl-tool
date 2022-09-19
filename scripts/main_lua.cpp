@@ -10,12 +10,6 @@ static std::vector<std::thread> Threads;
 static xTaskListManager TaskListManager;
 std::atomic_bool PublicStopFlag = false;
 
-static int Lua_HelloWorld(lua_State * LP)
-{
-	auto W = xLuaStateWrapper(LP);
-	return W.Return("Hello world!");
-}
-
 static int Lua_Exit(lua_State * LP)
 {
 	auto W = xLuaStateWrapper(LP);
@@ -41,7 +35,6 @@ static void LuaTaskThread()
     xLuaState LuaState;
     xTaskList TaskList;
 
-    LuaState.SetGlobal("LuaHelloWorld", &Lua_HelloWorld);
     LuaState.SetGlobal("LuaExit", &Lua_Exit);
     LuaState.SetGlobal("LuaLog", &Lua_Log);
     LuaState.SetGlobal("LuaMakeFile", &Lua_MakeFile);
@@ -59,6 +52,8 @@ static void LuaTaskThread()
     LuaState.SetGlobal("LuaIpaLaunchByBundleId", &Lua_IpaLaunchByBundleId);
     LuaState.SetGlobal("LuaIpaLaunchByBundleId", &Lua_IpaLaunchByBundleId);
     LuaState.SetGlobal("LuaGetIpAddress", &Lua_GetIpAddress);
+
+    LuaState.SetGlobal("LuaGetIpaDataDirectories", &Lua_GetIpaDataDirectories);
 
     LuaState.SetGlobal("LuaDeviceIdfv", GetDeviceIdfv());
     LuaState.SetGlobal("LuaFMVersion", GetFMVersion());
@@ -110,7 +105,7 @@ static void PostLuaTask(xTask* TaskPtr)
 void main_lua_init(size_t TaskThreadCount, const std::string & InitTask)
 {
     assert(!Run && Threads.empty());
-    LuaLogger.Init("xl.lua.log", true);
+    LuaLogger.Init(nullptr, true);
     if (!TaskThreadCount) {
         TaskThreadCount = 1;
     }

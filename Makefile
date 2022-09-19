@@ -42,7 +42,7 @@ xl_tool_FILES = \
 	${x_FILES}
 
 ExtraFramePaths = -F ${THEOS}/sdks/iPhoneOS.Extended
-xl_tool_CFLAGS  += -fobjc-arc -Wno-unused-function -Wno-deprecated -Wno-unused-but-set-variable ${ExtraFramePaths} ${minizip_DEFS}
+xl_tool_CFLAGS  += -fobjc-arc -Wno-unused-function -Wno-deprecated -Wno-unused-but-set-variable ${minizip_DEFS}
 xl_tool_CCFLAGS += -std=c++17 -Wno-unused-function -Wno-deprecated -Wno-unused-but-set-variable -Wno-auto-var-id
 xl_tool_LDFLAGS += ${ExtraFramePaths}
 xl_tool_FRAMEWORKS += IOKit XCTest

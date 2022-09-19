@@ -2,6 +2,7 @@
 #include "./X.hpp"
 #include <tuple>
 #include <string>
+#include <vector>
 
 extern "C" {
 #include "./3rd/lua/lua.h"
@@ -21,6 +22,10 @@ public:
     ~xLuaStateWrapper() = default;
 
     operator lua_State * () const { return _LuaStatePtr; }
+
+    void GC() const {
+        lua_gc(_LuaStatePtr, LUA_GCCOLLECT);
+    }
 
     bool LoadString(const char * CodeStr) {
         return LUA_OK == luaL_loadstring(_LuaStatePtr, CodeStr);
@@ -65,6 +70,15 @@ public:
     std::enable_if_t<std::is_floating_point_v<tArg>> Push(tArg Number) const { lua_pushnumber(_LuaStatePtr, Number); }
     template<typename...Args>
     void PushFS(const char * FmtStr, Args&&...args) const { lua_pushfstring(_LuaStatePtr, FmtStr, std::forward<Args>(args)...); }
+    template<typename T>
+    void Push(const std::vector<T>& Record) const {
+        lua_newtable(_LuaStatePtr);
+        for (size_t i = 0 ; i < Record.size(); ++i) {
+            Push(i+1);
+            Push(Record[i]);
+            lua_settable(_LuaStatePtr, -3);
+        }
+    }
 
     template<typename tFirstArg, typename...tOtherArgs>
     std::enable_if_t<static_cast<bool>(sizeof...(tOtherArgs))> Push(tFirstArg&& FirstArg, tOtherArgs&&...args) const {
