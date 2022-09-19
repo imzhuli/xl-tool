@@ -121,6 +121,7 @@ private:
 public:
     [[nodiscard]] inline xScopeGuard(const tEntry& Entry, const tExit& Exit) : _ExitCallback(Exit) { Entry(); }
     [[nodiscard]] inline xScopeGuard(const tExit& Exit) : _ExitCallback(Exit) {}
+    [[nodiscard]] inline xScopeGuard(xScopeGuard && Other) : _ExitCallback(Other._ExitCallback), _DismissExit(Steal(Other._DismissExit, true)) {}
     inline void Dismiss() { _DismissExit = true; }
     inline ~xScopeGuard() { if (_DismissExit) { return; } xRefCaster<tExit>::Get(_ExitCallback)(); }
 };
@@ -128,6 +129,8 @@ template<typename tEntry, typename tExit>
 xScopeGuard(const tEntry& Entry, const tExit& Exit) -> xScopeGuard<std::decay_t<tEntry>, std::decay_t<tExit>>;
 template<typename tExit>
 xScopeGuard(const tExit& Exit) -> xScopeGuard<xPass, std::decay_t<tExit>>;
+template<typename tEntry, typename tExit>
+xScopeGuard(xScopeGuard<tEntry, tExit> && Other) -> xScopeGuard<tEntry, tExit>;
 
 template<typename IteratorType>
 class xIteratorRange
